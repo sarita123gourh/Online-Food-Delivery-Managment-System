@@ -1,0 +1,81 @@
+# Target directories (build artifacts)
+target/
+build/
+dist/
+nbbuild/
+nbdist/
+
+# Keep build directories in specific locations
+!**/src/main/**/build/
+!**/src/test/**/build/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Maven-specific files
+.mvn/
+.mvn/wrapper/maven-wrapper.jar
+*.mvn/wrapper/maven-wrapper.properties
+
+# IntelliJ IDEA specific
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans specific
+/nbproject/private/
+/.nb-gradle/
+
+# Spring Tool Suite (STS) specific
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# Visual Studio Code specific
+.vscode/
+
+# Node.js dependencies
+node_modules/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Generated files
+*.class
+*.jar
+*.war
+*.ear
+
+# Exclude sensitive information
+*.key
+*.pem
+*.env
+
+# Exclude specific tools or caches
+.cache/
+.config/
+.aws/
+.docker/
+.gradle/
+.serverless/
+.redhat/
+
+# Keep README and HELP documentation
+!README.md
+!HELP.md
+
+# Include source code
+!src/**
+
+# Include Maven Wrapper
+!.mvn/wrapper/maven-wrapper.jar
