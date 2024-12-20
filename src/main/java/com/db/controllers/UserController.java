@@ -87,4 +87,5 @@ public class UserController {
         List<Users> user = service.getAllUsers();
         return ResponseEntity.ok(user);
     }
+
 }

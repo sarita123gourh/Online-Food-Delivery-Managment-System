@@ -32,6 +32,10 @@ public class Order {
         this.menuItems = menuItems;
     }
 
+    public Order() {
+
+    }
+
     // Getters and Setters
     public Long getOrderId() {
         return orderId;

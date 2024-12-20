@@ -52,4 +52,7 @@ public class UserServiceImpl implements UserService{
         return null;
     }
 
+    public Iterable<Users> findAll() {
+        return repo.findAll();
+    }
 }

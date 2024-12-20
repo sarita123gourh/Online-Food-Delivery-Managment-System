@@ -10,6 +10,10 @@ public class OrderRequest {
     public OrderRequest(Long userId, String johnDoe, Long[] menuItemIds) {
     }
 
+    public OrderRequest() {
+
+    }
+
     // Getters and Setters
     public String getCustomer() {
         return customer;

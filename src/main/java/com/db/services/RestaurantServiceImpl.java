@@ -26,7 +26,7 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public ResponseEntity<Iterable<Restaurant>> findAll() {
-        return null;
+        return (ResponseEntity<Iterable<Restaurant>>) restaurantRepository.findAll();
     }
 
     @Override

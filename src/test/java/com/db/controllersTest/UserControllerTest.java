@@ -1,101 +1,140 @@
 package com.db.controllersTest;
 
 import com.db.controllers.UserController;
+import com.db.entities.Restaurant;
 import com.db.entities.Users;
+import com.db.services.MenuItemService;
+import com.db.services.RestaurantService;
 import com.db.services.UserService;
+import com.db.services.UserServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class UserControllerTest {
-
-    private MockMvc mockMvc;
-
-    @Mock
-    private UserService userService;
 
     @InjectMocks
     private UserController userController;
 
-    public UserControllerTest() {
-        // Initialize mocks and setup MockMvc
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private RestaurantService restaurantService;
+
+    @Mock
+    private MenuItemService menuItemService;
+
+    @Mock
+    private UserServiceImpl service;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    void testSaveUser_Success() throws Exception {
-        // Mock the service layer
-        Users mockUser = new Users();
-        mockUser.setUser_id(1L);
-        mockUser.setUsername("John Doe");
+    void testGetRestaurantById_ShouldReturnNotFound_WhenNotFound() throws Exception {
+        // Arrange
+        when(restaurantService.findById(1L)).thenReturn(Optional.empty());
 
-        Mockito.when(userService.saveUsers(any(Users.class))).thenReturn(mockUser);
-
-        // Perform POST request
-        mockMvc.perform(post("/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"John Doe\"}"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"user_id\":1,\"username\":\"John Doe\"}"));
+        // Act & Assert
+        mockMvc.perform(get("/user/restaurants/1"))
+                .andExpect(status().isNotFound());
     }
-    @Test
-    void testSaveUser_Failure() throws Exception {
-        // Mock the service layer to throw an exception
-        Mockito.when(userService.saveUsers(any(Users.class)))
-                .thenThrow(new RuntimeException("Service failed"));
 
-        // Perform POST request
-        mockMvc.perform(post("/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"John Doe\"}"))
-                .andExpect(status().isInternalServerError()) // Check for 500 Internal Server Error
-                .andExpect(content().string("Failed to save user")); // Verify error message
-    }
     @Test
-    void testGetAllUsers_Success() throws Exception {
-        // Create mock user data
+    void testSaveUserWithOrder_ShouldReturnSavedUser() {
+        // Arrange
+        Users user = new Users();
+        user.setUsername("testUser");
+        when(userService.saveUsers(user)).thenReturn(user);
+
+        // Act
+        ResponseEntity<Users> response = userController.saveUserWithOrder(user);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("testUser", response.getBody().getUsername());
+    }
+
+    @Test
+    void testRegister_ShouldReturnRegisteredUser() {
+        // Arrange
+        Users user = new Users();
+        user.setUsername("newUser");
+        when(service.register(user)).thenReturn(user);
+
+        // Act
+        Users registeredUser = userController.register(user);
+
+        // Assert
+        assertNotNull(registeredUser);
+        assertEquals("newUser", registeredUser.getUsername());
+    }
+
+    @Test
+    void testLogin_ShouldReturnToken_WhenUserIsValid() {
+        // Arrange
+        Users user = new Users();
+        user.setUsername("testUser");
+        when(service.verify(user)).thenReturn("validToken");
+
+        // Act
+        String token = userController.login(user);
+
+        // Assert
+        assertEquals("validToken", token);
+    }
+
+    @Test
+    void testLogin_ShouldReturnError_WhenUserIsInvalid() {
+        // Arrange
+        Users user = new Users();
+        user.setUsername("invalidUser");
+        when(service.verify(user)).thenReturn("Invalid credentials");
+
+        // Act
+        String response = userController.login(user);
+
+        // Assert
+        assertEquals("Invalid credentials", response);
+    }
+
+    @Test
+    void testGetAllOrders_ShouldReturnUsers() throws Exception {
+        // Arrange
         Users user1 = new Users();
-        user1.setUser_id(1L);
-        user1.setUsername("John Doe");
-
+        user1.setUsername("testUser1");
         Users user2 = new Users();
-        user2.setUser_id(2L);
-        user2.setUsername("Jane Doe");
+        user2.setUsername("testUser2");
 
-        // Mock the service layer to return a list of users
-        Mockito.when(userService.findAll()).thenReturn(List.of(user1, user2));
+        List<Users> users = Arrays.asList(user1, user2);
+        when(service.getAllUsers()).thenReturn(users);
 
-        // Perform GET request
-        mockMvc.perform(get("/user")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) // Check for 200 OK status
-                .andExpect(content().json("[{\"user_id\":1,\"username\":\"John Doe\"},{\"user_id\":2,\"username\":\"Jane Doe\"}]")); // Check the response body
+        // Act & Assert
+        mockMvc.perform(get("/user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].username").value("testUser1"))
+                .andExpect(jsonPath("$[1].username").value("testUser2"));
     }
-
-    @Test
-    void testGetAllUsers_Failure() throws Exception {
-        // Mock the service layer to throw an exception
-        Mockito.when(userService.findAll()).thenThrow(new RuntimeException("Failed to fetch users"));
-
-        // Perform GET request
-        mockMvc.perform(get("/user")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError()) // Check for 500 Internal Server Error status
-                .andExpect(content().string("Failed to fetch users")); // Check for the error message in the response
-    }
-
 }
