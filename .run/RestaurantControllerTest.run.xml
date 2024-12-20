@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RestaurantControllerTest" type="JUnit" factoryName="JUnit" singleton="false" nameIsGenerated="true">
+    <module name="Online_Food_Delivery_System" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.db.controllersTest.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="com.db.controllersTest" />
+    <option name="MAIN_CLASS_NAME" value="com.db.controllersTest.RestaurantControllerTest" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
